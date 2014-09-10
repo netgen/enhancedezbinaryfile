@@ -1,3 +1,6 @@
 {
-    "name": "netgen/enhancedezbinaryfile"
+    "name": "netgen/enhancedezbinaryfile",
+    "require": {
+        "netgen/ngmore-legacy-installer": "*"
+    }
 }
