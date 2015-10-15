@@ -141,7 +141,11 @@ class EnhancedeZBinaryFileType extends eZDataType
         $sys = eZSys::instance();
         $storage_dir = $sys->storageDirectory();
 
-        require_once( 'kernel/classes/ezclusterfilehandler.php' );
+        $moduleINI = eZINI::instance( 'module.ini' );
+        $downloadPath=$moduleINI->variable('RemoveFiles', 'DownloadPath');
+        $downloadPath=trim($downloadPath,"/");
+        if (!$downloadPath) $downloadPath='original/collected';
+
         if ( $version == null )
         {
             $binaryFiles = eZBinaryFile::fetch( $contentObjectAttributeID );
@@ -218,8 +222,11 @@ class EnhancedeZBinaryFileType extends eZDataType
     {
     /*gets hit the first time through*/
         EnhancedeZBinaryFileType::checkFileUploads();
-        if ( !EnhancedeZBinaryFileType::canFetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) ) )
+        $canFetch = EnhancedeZBinaryFileType::canFetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) );
+        if ( $canFetch !== 0 && $canFetch !== true )
+        {
             return false;
+        }
 
         $binaryFile = eZHTTPFile::fetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) );
 
@@ -269,7 +276,6 @@ class EnhancedeZBinaryFileType extends eZDataType
 
             // VS-DBFILE
 
-            require_once( 'kernel/classes/ezclusterfilehandler.php' );
             $filePath = $binaryFile->attribute( 'filename' );
             $fileHandler = eZClusterFileHandler::instance();
             $fileHandler->fileStore( $filePath, 'binaryfile', true, $mime );
@@ -390,7 +396,7 @@ class EnhancedeZBinaryFileType extends eZDataType
         $binaryFile = eZHTTPFile::fetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) );
 	if (!$binaryFile) return eZInputValidator::STATE_INVALID;
 
-        $moduleINI = eZINI::instance( 'module.ini.append.php', 'settings');
+        $moduleINI = eZINI::instance( 'module.ini' );
 	$allowed = $moduleINI->variable('AllowedFileTypes', 'AllowedFileTypeList');
 
 	// $binaryFile->attribute( 'mime_type_part' ) not always the extension
@@ -406,7 +412,7 @@ class EnhancedeZBinaryFileType extends eZDataType
         if ( $binaryFile instanceof eZHTTPFile )
         {
 		//clean up older files.
-		$moduleINI = eZINI::instance( 'module.ini.append.php', 'settings');
+		$moduleINI = eZINI::instance( 'module.ini' );
 		$maxFiles=$moduleINI->variable('RemoveFiles', 'MaxFiles');
 		$downloadPath=$moduleINI->variable('RemoveFiles', 'DownloadPath');
 		$downloadPath=trim($downloadPath,"/");
@@ -515,7 +521,7 @@ class EnhancedeZBinaryFileType extends eZDataType
         $binaryFile = eZHTTPFile::fetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) );
 	if (!$binaryFile) return eZInputValidator::STATE_INVALID;
 
-        $moduleINI = eZINI::instance( 'module.ini.append.php', 'settings');
+        $moduleINI = eZINI::instance( 'module.ini' );
 	$allowed = $moduleINI->variable('AllowedFileTypes', 'AllowedFileTypeList');
 
 	// $binaryFile->attribute( 'mime_type_part' ) not always the extension
@@ -804,7 +810,6 @@ class EnhancedeZBinaryFileType extends eZDataType
 
         // VS-DBFILE + SP DBFile fix
 
-        require_once( 'kernel/classes/ezclusterfilehandler.php' );
         $fileHandler = eZClusterFileHandler::instance();
         $fileHandler->fileStore( $destinationPath . $basename, 'binaryfile', true );
     }
