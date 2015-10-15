@@ -141,7 +141,7 @@ class EnhancedeZBinaryFileType extends eZDataType
         $sys = eZSys::instance();
         $storage_dir = $sys->storageDirectory();
 
-        $moduleINI = eZINI::instance( 'module.ini.append.php', 'settings');
+        $moduleINI = eZINI::instance( 'module.ini' );
         $downloadPath=$moduleINI->variable('RemoveFiles', 'DownloadPath');
         $downloadPath=trim($downloadPath,"/");
         if (!$downloadPath) $downloadPath='original/collected';require_once( 'kernel/classes/ezclusterfilehandler.php' );
@@ -398,7 +398,7 @@ class EnhancedeZBinaryFileType extends eZDataType
         $binaryFile = eZHTTPFile::fetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) );
 	if (!$binaryFile) return eZInputValidator::STATE_INVALID;
 
-        $moduleINI = eZINI::instance( 'module.ini.append.php', 'settings');
+        $moduleINI = eZINI::instance( 'module.ini' );
 	$allowed = $moduleINI->variable('AllowedFileTypes', 'AllowedFileTypeList');
 
 	// $binaryFile->attribute( 'mime_type_part' ) not always the extension
@@ -414,7 +414,7 @@ class EnhancedeZBinaryFileType extends eZDataType
         if ( $binaryFile instanceof eZHTTPFile )
         {
 		//clean up older files.
-		$moduleINI = eZINI::instance( 'module.ini.append.php', 'settings');
+		$moduleINI = eZINI::instance( 'module.ini' );
 		$maxFiles=$moduleINI->variable('RemoveFiles', 'MaxFiles');
 		$downloadPath=$moduleINI->variable('RemoveFiles', 'DownloadPath');
 		$downloadPath=trim($downloadPath,"/");
@@ -523,7 +523,7 @@ class EnhancedeZBinaryFileType extends eZDataType
         $binaryFile = eZHTTPFile::fetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) );
 	if (!$binaryFile) return eZInputValidator::STATE_INVALID;
 
-        $moduleINI = eZINI::instance( 'module.ini.append.php', 'settings');
+        $moduleINI = eZINI::instance( 'module.ini' );
 	$allowed = $moduleINI->variable('AllowedFileTypes', 'AllowedFileTypeList');
 
 	// $binaryFile->attribute( 'mime_type_part' ) not always the extension
