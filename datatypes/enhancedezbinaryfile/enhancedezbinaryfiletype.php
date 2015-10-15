@@ -141,6 +141,11 @@ class EnhancedeZBinaryFileType extends eZDataType
         $sys = eZSys::instance();
         $storage_dir = $sys->storageDirectory();
 
+        $moduleINI = eZINI::instance( 'module.ini.append.php', 'settings');
+        $downloadPath=$moduleINI->variable('RemoveFiles', 'DownloadPath');
+        $downloadPath=trim($downloadPath,"/");
+        if (!$downloadPath) $downloadPath='original/collected';require_once( 'kernel/classes/ezclusterfilehandler.php' );
+
         require_once( 'kernel/classes/ezclusterfilehandler.php' );
         if ( $version == null )
         {
