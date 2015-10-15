@@ -223,7 +223,7 @@ class EnhancedeZBinaryFileType extends eZDataType
     {
     /*gets hit the first time through*/
         EnhancedeZBinaryFileType::checkFileUploads();
-        if ( !EnhancedeZBinaryFileType::canFetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) ) )
+        if ( EnhancedeZBinaryFileType::canFetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) ) !== false )
             return false;
 
         $binaryFile = eZHTTPFile::fetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) );
