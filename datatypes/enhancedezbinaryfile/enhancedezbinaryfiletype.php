@@ -144,9 +144,8 @@ class EnhancedeZBinaryFileType extends eZDataType
         $moduleINI = eZINI::instance( 'module.ini' );
         $downloadPath=$moduleINI->variable('RemoveFiles', 'DownloadPath');
         $downloadPath=trim($downloadPath,"/");
-        if (!$downloadPath) $downloadPath='original/collected';require_once( 'kernel/classes/ezclusterfilehandler.php' );
+        if (!$downloadPath) $downloadPath='original/collected';
 
-        require_once( 'kernel/classes/ezclusterfilehandler.php' );
         if ( $version == null )
         {
             $binaryFiles = eZBinaryFile::fetch( $contentObjectAttributeID );
@@ -277,7 +276,6 @@ class EnhancedeZBinaryFileType extends eZDataType
 
             // VS-DBFILE
 
-            require_once( 'kernel/classes/ezclusterfilehandler.php' );
             $filePath = $binaryFile->attribute( 'filename' );
             $fileHandler = eZClusterFileHandler::instance();
             $fileHandler->fileStore( $filePath, 'binaryfile', true, $mime );
@@ -812,7 +810,6 @@ class EnhancedeZBinaryFileType extends eZDataType
 
         // VS-DBFILE + SP DBFile fix
 
-        require_once( 'kernel/classes/ezclusterfilehandler.php' );
         $fileHandler = eZClusterFileHandler::instance();
         $fileHandler->fileStore( $destinationPath . $basename, 'binaryfile', true );
     }
