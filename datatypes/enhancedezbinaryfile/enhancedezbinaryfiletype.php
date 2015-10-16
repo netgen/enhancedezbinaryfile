@@ -11,6 +11,8 @@ class EnhancedeZBinaryFileType extends eZDataType
 {
     const MAX_FILESIZE_FIELD = 'data_int1';
     const MAX_FILESIZE_VARIABLE = '_enhancedezbinaryfile_max_filesize_';
+    const ALLOWED_FILE_TYPES_FIELD = 'data_text1';
+    const ALLOWED_FILE_TYPES_VARIABLE = '_enhancedezbinaryfile_allowed_file_types_';
     const DATA_TYPE_STRING = "enhancedezbinaryfile";
 
     /** constructor */
