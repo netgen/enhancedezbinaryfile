@@ -1,28 +1,4 @@
 <?php
-//
-// Definition of EnhancedeZBinaryFileType class
-//
-// SOFTWARE NAME: eZ Publish
-// SOFTWARE RELEASE: 4.5.0
-// BUILD VERSION: 21995
-// COPYRIGHT NOTICE: Copyright (C) 1999-2012 Leiden Tech
-// SOFTWARE LICENSE: GNU General Public License v2.0
-// NOTICE: >
-//   This program is free software; you can redistribute it and/or
-//   modify it under the terms of version 2.0  of the GNU General
-//   Public License as published by the Free Software Foundation.
-//
-//   This program is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//
-//   You should have received a copy of version 2.0 of the GNU General
-//   Public License along with this program; if not, write to the Free
-//   Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-//   MA 02110-1301, USA.
-//
-//
 
 /*!
   \class EnhancedeZBinaryFileType enhancedezbinaryfiletype.php
@@ -630,10 +606,15 @@ class EnhancedeZBinaryFileType extends eZDataType
             return true;
     }
 
-    /*!
-     \return the XML structure in \a $domDocument as text.
-             It will take of care of the necessary charset conversions
-             for content storage.
+    /** method domString()
+    *
+    * return the XML structure in $domDocument as text.
+    * It will take of care of the necessary charset conversions
+    * for content storage.
+    *
+    * @param $domDocument DOMDocument
+    *
+    * @return string 
     */
     function domString( $domDocument )
     {
@@ -655,6 +636,12 @@ class EnhancedeZBinaryFileType extends eZDataType
         return $domString;
     }
 
+    /** method metaData()
+    *
+    * @param $contentObjectAttribute eZContentObjectAttribute
+    *
+    * @return string 
+    */
     function metaData( $contentObjectAttribute )
     {
         $binaryFile = $contentObjectAttribute->content();
@@ -667,9 +654,12 @@ class EnhancedeZBinaryFileType extends eZDataType
         return $metaData;
     }
 
-    /*!
-     \reimp
-    */
+    /** method serializeContentClassAttribute()
+     *
+     * @param $classAttribute eZContentClassAttribute
+     * @param $attributeNode DOMDocument
+     * @param $attributeParametersNode DOMDocument
+     */
     function serializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
     {
         $dom = $attributeParametersNode->ownerDocument;
@@ -679,9 +669,12 @@ class EnhancedeZBinaryFileType extends eZDataType
         $attributeParametersNode->appendChild( $maxSizeNode );
     }
 
-    /*!
-     \reimp
-    */
+    /** method unserializeContentClassAttribute()
+     *
+     * @param $classAttribute eZContentClassAttribute
+     * @param $attributeNode DOMDocument
+     * @param $attributeParametersNode DOMDocument
+     */
     function unserializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
     {
         $sizeNode = $attributeParametersNode->getElementsByTagName( 'max-size' )->item( 0 );
@@ -690,10 +683,12 @@ class EnhancedeZBinaryFileType extends eZDataType
         $classAttribute->setAttribute( self::MAX_FILESIZE_FIELD, $maxSize );
     }
 
-    /*!
-     \return string representation of an contentobjectattribute data for simplified export
-
-    */
+    /** method toString()
+     *
+     * @param $objectAttribute eZContentObjectAttribute
+     *
+     * @return string
+     */
     function toString( $objectAttribute )
     {
         $binaryFile = $objectAttribute->content();
@@ -706,6 +701,13 @@ class EnhancedeZBinaryFileType extends eZDataType
             return '';
     }
 
+    /** method fromString()
+     *
+     * @param $objectAttribute eZContentObjectAttribute
+     * @param $string string
+     *
+     * @return bool|null
+     */
     function fromString( $objectAttribute, $string )
     {
         if( !$string )
@@ -720,12 +722,15 @@ class EnhancedeZBinaryFileType extends eZDataType
                                          $result );
     }
 
-    /*!
-     \param package
-     \param content attribute
-
-     \return a DOM representation of the content object attribute
-    */
+    /** method serializeContentObjectAttribute()
+     *
+     * return a DOM representation of the content object attribute
+     *
+     * @param $package eZPackage
+     * @param $objectAttribute eZContentObjectAttribute
+     *
+     * @return DOMElement
+     */
     function serializeContentObjectAttribute( $package, $objectAttribute )
     {
         $node = $this->createContentObjectAttributeDOMNode( $objectAttribute );
@@ -749,12 +754,12 @@ class EnhancedeZBinaryFileType extends eZDataType
         return $node;
     }
 
-    /*!
-     \reimp
-     \param package
-     \param contentobject attribute object
-     \param domnode object
-    */
+    /** method unserializeContentObjectAttribute()
+     *
+     * @param $package eZPackage
+     * @param $objectAttribute eZContentObjectAttribute
+     * @param $attributeNode DOMDocument
+     */
     function unserializeContentObjectAttribute( $package, $objectAttribute, $attributeNode )
     {
         $fileNode = $attributeNode->getElementsByTagName( 'binary-file' )->item( 0 );
@@ -774,7 +779,6 @@ class EnhancedeZBinaryFileType extends eZDataType
             return false;
         }
 
-        //include_once( 'lib/ezfile/classes/ezdir.php' );
         $ini = eZINI::instance();
         $mimeType = $fileNode->getAttribute( 'mime-type' );
         list( $mimeTypeCategory, $mimeTypeName ) = explode( '/', $mimeType );
@@ -796,7 +800,6 @@ class EnhancedeZBinaryFileType extends eZDataType
             $basename = substr( md5( mt_rand() ), 0, 8 ) . '.' . eZFile::suffix( $fileNode->getAttribute( 'filename' ) );
         }
 
-        //include_once( 'lib/ezfile/classes/ezfilehandler.php' );
         eZFileHandler::copy( $sourcePath, $destinationPath . $basename );
         eZDebug::writeNotice( 'Copied: ' . $sourcePath . ' to: ' . $destinationPath . $basename,
                               'EnhancedeZBinaryFileType::unserializeContentObjectAttribute()' );
