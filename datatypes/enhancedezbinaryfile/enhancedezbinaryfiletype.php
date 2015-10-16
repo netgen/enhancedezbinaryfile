@@ -44,14 +44,20 @@ class EnhancedeZBinaryFileType extends eZDataType
         );
     }
 
-    /** return the binary file handler.
-    */
+    /** method fileHandler()
+     *
+     *  returns the binary file handler.
+     *
+     * @return eZBinaryFileHandler
+     */
     function fileHandler()
     {
         return eZBinaryFileHandler::instance();
     }
 
-    /** return the template name which the handler decides upon.
+    /** method viewTemplate()
+     *
+     * return the template name which the handler decides upon.
      *
      * @param $contentobjectAttribute eZContentObjectAttribute
      *
@@ -67,14 +73,18 @@ class EnhancedeZBinaryFileType extends eZDataType
         return $template;
     }
 
-    /*!
-     \return the template name to use for editing the attribute.
-     \note Default is to return the datatype string which is OK
-           for most datatypes, if you want dynamic templates
-           reimplement this function and return a template name.
-     \note The returned template name does not include the .tpl extension.
-     \sa viewTemplate, informationTemplate
-    */
+    /** method editTemplate()
+     *
+     * return the template name to use for editing the attribute.
+     *
+     * Default is to return the datatype string which is OK for most datatypes,
+     * if you want dynamic templates reimplement this function and return a template name.
+     * The returned template name does not include the .tpl extension.
+     *
+     * @param $contentobjectAttribute eZContentObjectAttribute
+     *
+     * @return string
+     */
     function editTemplate( $contentobjectAttribute )
     {
         $handler = $this->fileHandler();
@@ -85,15 +95,18 @@ class EnhancedeZBinaryFileType extends eZDataType
         return $template;
     }
 
-    /*!
-     \return the template name to use for information collection for the attribute.
-     \note Default is to return the datatype string which is OK
-           for most datatypes, if you want dynamic templates
-           reimplement this function and return a template name.
-     \note The returned template name does not include the .tpl extension.
-     \sa viewTemplate, editTemplate
-    */
-
+    /** method informationTemplate()
+     *
+     * return the template name to use for information collection for the attribute.
+     *
+     * Default is to return the datatype string which is OK for most datatypes,
+     * if you want dynamic templates reimplement this function and return a template name.
+     * The returned template name does not include the .tpl extension.
+     *
+     * @param $contentobjectAttribute eZContentObjectAttribute
+     *
+     * @return string
+     */
     function informationTemplate( $contentobjectAttribute )
     {
         $handler = $this->fileHandler();
@@ -104,9 +117,15 @@ class EnhancedeZBinaryFileType extends eZDataType
         return $template;
     }
 
-    /*!
-     Sets value according to current version
-    */
+    /** method initializeObjectAttribute()
+     *
+     * Sets value according to current version
+     *
+     * @param $contentObjectAttribute eZContentObjectAttribute
+     * @param $currentVersion int
+     * @param $originalContentObjectAttribute eZContentObjectAttribute
+     *
+     */
     function initializeObjectAttribute( $contentObjectAttribute, $currentVersion, $originalContentObjectAttribute )
     {
         if ( $currentVersion != false )
@@ -123,31 +142,36 @@ class EnhancedeZBinaryFileType extends eZDataType
         }
     }
 
-    /*!
-     Delete stored attribute
-    */
+    /** method deleteStoredObjectAttribute()
+     *
+     * Delete stored attribute
+     * This is called when you delete the datatype from the class
+     *
+     * @param $contentObjectAttribute eZContentObjectAttribute
+     * @param $version int
+     *
+     */
     function deleteStoredObjectAttribute( $contentObjectAttribute, $version = null )
     {
-    /* This is called when you delete the datatype from the class*/
         $contentObjectAttributeID = $contentObjectAttribute->attribute( "id" );
         $sys = eZSys::instance();
         $storage_dir = $sys->storageDirectory();
 
         $moduleINI = eZINI::instance( 'module.ini' );
-        $downloadPath=$moduleINI->variable('RemoveFiles', 'DownloadPath');
-        $downloadPath=trim($downloadPath,"/");
-        if (!$downloadPath) $downloadPath='original/collected';
+        $downloadPath = $moduleINI->variable( 'RemoveFiles', 'DownloadPath' );
+        $downloadPath = trim( $downloadPath, "/" );
+        if ( !$downloadPath ) $downloadPath = 'original/collected';
 
         if ( $version == null )
         {
             $binaryFiles = eZBinaryFile::fetch( $contentObjectAttributeID );
             eZBinaryFile::removeByID( $contentObjectAttributeID, null );
 
-            foreach ( $binaryFiles as  $binaryFile )
+            foreach ( $binaryFiles as $binaryFile )
             {
                 $mimeType =  $binaryFile->attribute( "mime_type" );
-                list( $prefix, $suffix ) = split ('[/]', $mimeType );
-                $orig_dir = $storage_dir . '/'.$downloadPath.'/' . $prefix;
+                list( $prefix, $suffix ) = preg_split ( '[/]', $mimeType );
+                $orig_dir = $storage_dir . '/'. $downloadPath . '/' . $prefix;
                 $fileName = $binaryFile->attribute( "filename" );
 
                 // Check if there are any other records in ezbinaryfile that point to that fileName.
@@ -167,7 +191,7 @@ class EnhancedeZBinaryFileType extends eZDataType
             if ( $binaryFile != null )
             {
                 $mimeType =  $binaryFile->attribute( "mime_type" );
-                list( $prefix, $suffix ) = split ('[/]', $mimeType );
+                list( $prefix, $suffix ) = preg_split ('[/]', $mimeType );
                 $orig_dir = $storage_dir . "/original/" . $prefix;
                 $fileName = $binaryFile->attribute( "filename" );
 
@@ -185,8 +209,9 @@ class EnhancedeZBinaryFileType extends eZDataType
         }
     }
 
-    /*!
-     Checks if file uploads are enabled, if not it gives a warning.
+    /** method checkFileUploads()
+     *
+     * Checks if file uploads are enabled, if not it gives a warning.
     */
     function checkFileUploads()
     {
@@ -194,25 +219,28 @@ class EnhancedeZBinaryFileType extends eZDataType
         if ( !$isFileUploadsEnabled )
         {
             $isFileWarningAdded = $GLOBALS['eZBinaryFileTypeWarningAdded'];
-            if ( !isset( $isFileWarningAdded ) or
-                 !$isFileWarningAdded )
+            if ( !isset( $isFileWarningAdded ) or !$isFileWarningAdded )
             {
-                eZAppendWarningItem( array( 'error' => array( 'type' => 'kernel',
-                                                              'number' => eZError::KERNEL_NOT_AVAILABLE ),
-                                            'text' => ezpI18n::tr( 'kernel/classes/datatypes',
-                                                              'File uploading is not enabled. Please contact the site administrator to enable it.' ) ) );
+                eZAppendWarningItem(
+                    array(
+                        'error' => array(
+                            'type' => 'kernel',
+                            'number' => eZError::KERNEL_NOT_AVAILABLE ),
+                            'text' => ezpI18n::tr( 'kernel/classes/datatypes', 'File uploading is not enabled. Please contact the site administrator to enable it.' )
+                    )
+                );
                 $GLOBALS['eZBinaryFileTypeWarningAdded'] = true;
             }
         }
     }
 
 
-        /*!
-     Fetches the http post var integer input and stores it in the data instance.
-    */
+    /*!
+ Fetches the http post var integer input and stores it in the data instance.
+*/
     function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
-    /*gets hit the first time through*/
+        /*gets hit the first time through*/
         EnhancedeZBinaryFileType::checkFileUploads();
         $canFetch = EnhancedeZBinaryFileType::canFetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) );
         if ( $canFetch !== 0 && $canFetch !== true )
@@ -248,7 +276,7 @@ class EnhancedeZBinaryFileType extends eZDataType
             if ( !$binaryFile->store( "original", $extension ) )
             {
                 eZDebug::writeError( "Failed to store http-file: " . $binaryFile->attribute( "original_filename" ),
-                                     "EnhancedeZBinaryFileType" );
+                    "EnhancedeZBinaryFileType" );
                 return false;
             }
 
@@ -346,7 +374,7 @@ class EnhancedeZBinaryFileType extends eZDataType
     {
         $value = false;
         $binaryFile = eZBinaryFile::fetch( $contentObjectAttribute->attribute( 'id' ),
-                                           $contentObjectAttribute->attribute( 'version' ) );
+            $contentObjectAttribute->attribute( 'version' ) );
         if ( is_object( $binaryFile ) )
             $value = $binaryFile->attribute( $name );
 
@@ -355,9 +383,9 @@ class EnhancedeZBinaryFileType extends eZDataType
 
     function hasObjectAttributeContent( $contentObjectAttribute )
     {
-    /* Gets hit the first time through */
+        /* Gets hit the first time through */
         $binaryFile = eZBinaryFile::fetch( $contentObjectAttribute->attribute( "id" ),
-                                            $contentObjectAttribute->attribute( "version" ) );
+            $contentObjectAttribute->attribute( "version" ) );
         if ( !$binaryFile )
             return false;
         return true;
@@ -438,7 +466,7 @@ class EnhancedeZBinaryFileType extends eZDataType
             $maxFiles = $moduleINI->variable( 'RemoveFiles', 'MaxFiles' );
             $downloadPath = $moduleINI->variable( 'RemoveFiles', 'DownloadPath' );
             $downloadPath = trim( $downloadPath, "/" );
-            if ( !$downloadPath ) 
+            if ( !$downloadPath )
                 $downloadPath = 'original/collected';
 
             if ( $maxFiles > 0 )
@@ -482,9 +510,9 @@ class EnhancedeZBinaryFileType extends eZDataType
             $binaryFile->setMimeType( $mime );
             if ( !$binaryFile->store( $downloadPath, $extension ) )
             {
-                eZDebug::writeError( 
+                eZDebug::writeError(
                     "Failed to store http-file: " . $binaryFile->attribute( "original_filename" ),
-                    "EnhancedeZBinaryFileType" 
+                    "EnhancedeZBinaryFileType"
                 );
                 return false;
             }
@@ -518,7 +546,7 @@ class EnhancedeZBinaryFileType extends eZDataType
         /*WITH THE ENCTYPE OF MULTIPART THE $_POST FOR A FILE IS EMPTY so can't use haspostvariable */
 
         $binaryFile = eZHTTPFile::fetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) );
-            $classAttribute = $contentObjectAttribute->contentClassAttribute();
+        $classAttribute = $contentObjectAttribute->contentClassAttribute();
         //This is only checking if it is required or not
         if ( !$binaryFile )
         {
@@ -577,24 +605,24 @@ class EnhancedeZBinaryFileType extends eZDataType
         $mustUpload = false;
         $maxSize = 1024 * 1024 * $classAttribute->attribute( self::MAX_FILESIZE_FIELD );
 
-/* Since it is not an ezbinary file this can never be true
-   unfortunately, this is where the check would be to not upload the file
-   multiple times in the event the form fails somewhere.  Unfortunately it
-   can't be a binary file since it is a collection object and not a content
-   object.
-    if ( $contentObjectAttribute->validateIsRequired() )
-        {
-            $contentObjectAttributeID = $contentObjectAttribute->attribute( "id" );
-            $version = $contentObjectAttribute->attribute( "version" );
-            $binary = eZBinaryFile::fetch( $contentObjectAttributeID, $version );
-            if ( $binary === null )
-            {
-                $mustUpload = true;
-            }
-        }
-*/
+        /* Since it is not an ezbinary file this can never be true
+           unfortunately, this is where the check would be to not upload the file
+           multiple times in the event the form fails somewhere.  Unfortunately it
+           can't be a binary file since it is a collection object and not a content
+           object.
+            if ( $contentObjectAttribute->validateIsRequired() )
+                {
+                    $contentObjectAttributeID = $contentObjectAttribute->attribute( "id" );
+                    $version = $contentObjectAttribute->attribute( "version" );
+                    $binary = eZBinaryFile::fetch( $contentObjectAttributeID, $version );
+                    if ( $binary === null )
+                    {
+                        $mustUpload = true;
+                    }
+                }
+        */
         $canFetchResult = EnhancedeZBinaryFileType::canFetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ), $maxSize );
-    //$binaryfile doesn't have an attribute(http_name)
+        //$binaryfile doesn't have an attribute(http_name)
         if ( $mustUpload && $canFetchResult === eZHTTPFile::UPLOADEDFILE_DOES_NOT_EXIST )
         {
             $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'A valid file is required.' ) );
@@ -610,7 +638,7 @@ class EnhancedeZBinaryFileType extends eZDataType
             $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'The size of the uploaded file exceeds the maximum upload size: %1 bytes.' ), $maxSize );
             return eZInputValidator::STATE_INVALID;
         }
-    //Dropped all the way through with no error
+        //Dropped all the way through with no error
         return eZInputValidator::STATE_ACCEPTED;
     }
     /*!
@@ -625,10 +653,10 @@ class EnhancedeZBinaryFileType extends eZDataType
     */
     function canFetch( $http_name, $maxSize = false )
     {
-       if ( isset( $GLOBALS["eZHTTPFile-$http_name"] ) AND
-           $GLOBALS["eZHTTPFile-$http_name"] instanceof eZHTTPFile  )
+        if ( isset( $GLOBALS["eZHTTPFile-$http_name"] ) AND
+            $GLOBALS["eZHTTPFile-$http_name"] instanceof eZHTTPFile  )
         {
-        //No idea why it's the opposite from ezHTTPFile::canfetch
+            //No idea why it's the opposite from ezHTTPFile::canfetch
             if ( $maxSize === false )
             {
                 return isset( $_FILES[$http_name] ) and $_FILES[$http_name]['name'] != "" and $_FILES[$http_name]['error'] == 0;
@@ -655,8 +683,7 @@ class EnhancedeZBinaryFileType extends eZDataType
 
                     default:
                     {
-                        return ( $maxSize == 0 || $_FILES[$http_name]['size'] <= $maxSize )? eZHTTPFile::UPLOADEDFILE_OK:
-                        eZHTTPFile::UPLOADEDFILE_EXCEEDS_MAX_SIZE;
+                        return ( $maxSize == 0 || $_FILES[$http_name]['size'] <= $maxSize ) ? eZHTTPFile::UPLOADEDFILE_OK: eZHTTPFile::UPLOADEDFILE_EXCEEDS_MAX_SIZE;
                     }
                 }
             }
@@ -672,15 +699,15 @@ class EnhancedeZBinaryFileType extends eZDataType
     }
 
     /** method domString()
-    *
-    * return the XML structure in $domDocument as text.
-    * It will take of care of the necessary charset conversions
-    * for content storage.
-    *
-    * @param $domDocument DOMDocument
-    *
-    * @return string 
-    */
+     *
+     * return the XML structure in $domDocument as text.
+     * It will take of care of the necessary charset conversions
+     * for content storage.
+     *
+     * @param $domDocument DOMDocument
+     *
+     * @return string
+     */
     function domString( $domDocument )
     {
         $ini = eZINI::instance();
@@ -702,11 +729,11 @@ class EnhancedeZBinaryFileType extends eZDataType
     }
 
     /** method metaData()
-    *
-    * @param $contentObjectAttribute eZContentObjectAttribute
-    *
-    * @return string 
-    */
+     *
+     * @param $contentObjectAttribute eZContentObjectAttribute
+     *
+     * @return string
+     */
     function metaData( $contentObjectAttribute )
     {
         $binaryFile = $contentObjectAttribute->content();
@@ -779,12 +806,13 @@ class EnhancedeZBinaryFileType extends eZDataType
             return true;
 
         $result = array();
-        return $this->insertRegularFile( $objectAttribute->attribute( 'object' ),
-                                         $objectAttribute->attribute( 'version' ),
-                                         $objectAttribute->attribute( 'language_code' ),
-                                         $objectAttribute,
-                                         $string,
-                                         $result );
+        return $this->insertRegularFile(
+            $objectAttribute->attribute( 'object' ),
+            $objectAttribute->attribute( 'version' ),
+            $objectAttribute->attribute( 'language_code' ),
+            $objectAttribute,
+            $string,
+            $result );
     }
 
     /** method serializeContentObjectAttribute()
@@ -840,7 +868,7 @@ class EnhancedeZBinaryFileType extends eZDataType
         if ( !file_exists( $sourcePath ) )
         {
             eZDebug::writeError( "The file '$sourcePath' does not exist, cannot initialize file attribute with it",
-                                 'EnhancedeZBinaryFileType::unserializeContentObjectAttribute' );
+                'EnhancedeZBinaryFileType::unserializeContentObjectAttribute' );
             return false;
         }
 
@@ -867,7 +895,7 @@ class EnhancedeZBinaryFileType extends eZDataType
 
         eZFileHandler::copy( $sourcePath, $destinationPath . $basename );
         eZDebug::writeNotice( 'Copied: ' . $sourcePath . ' to: ' . $destinationPath . $basename,
-                              'EnhancedeZBinaryFileType::unserializeContentObjectAttribute()' );
+            'EnhancedeZBinaryFileType::unserializeContentObjectAttribute()' );
 
         $binaryFile->setAttribute( 'contentobject_attribute_id', $objectAttribute->attribute( 'id' ) );
         $binaryFile->setAttribute( 'filename', $basename );
