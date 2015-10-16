@@ -13,34 +13,48 @@ class EnhancedeZBinaryFileType extends eZDataType
     const MAX_FILESIZE_VARIABLE = '_enhancedezbinaryfile_max_filesize_';
     const DATA_TYPE_STRING = "enhancedezbinaryfile";
 
-    /*!
-     Construction of the class, note that the second parameter in eZDataType
-     is the actual name showed in the datatype dropdown list.
-    */
+    /** constructor */
     function __construct()
     {
-        parent::__construct( self::DATA_TYPE_STRING, ezpI18n::tr( 'extension/enhancedezbinaryfile/datatype', 'Enhanced File', 'Datatype name' ), array( 'serialize_supported' => true, 'object_serialize_map' => array( 'data_text' => 'filename' )));
+        parent::__construct(
+            self::DATA_TYPE_STRING,
+            ezpI18n::tr( 'extension/enhancedezbinaryfile/datatype', 'Enhanced File', 'Datatype name' ),
+            array(
+                'serialize_supported' => true,
+                'object_serialize_map' => array(
+                    'data_text' => 'filename'
+                )
+            )
+        );
     }
 
     function EnhancedeZBinaryFileType()
     {
-        $this->eZDataType( self::DATA_TYPE_STRING, ezpI18n::tr( 'kernel/classes/datatypes', "Enhanced File", 'Datatype name' ),
-                           array( 'serialize_supported' => true,'object_serialize_map' => array( 'data_text' => 'filename' )
-                            ));
+        $this->eZDataType(
+            self::DATA_TYPE_STRING,
+            ezpI18n::tr( 'kernel/classes/datatypes', "Enhanced File", 'Datatype name' ),
+            array(
+                'serialize_supported' => true,
+                'object_serialize_map' => array(
+                    'data_text' => 'filename'
+                )
+            )
+        );
     }
 
-    /*!
-     \return the binary file handler.
+    /** return the binary file handler.
     */
     function fileHandler()
     {
         return eZBinaryFileHandler::instance();
     }
 
-    /*!
-     \reimp
-     \return the template name which the handler decides upon.
-    */
+    /** return the template name which the handler decides upon.
+     *
+     * @param $contentobjectAttribute eZContentObjectAttribute
+     *
+     * @return string
+     */
     function viewTemplate( $contentobjectAttribute )
     {
         $handler = $this->fileHandler();
