@@ -170,13 +170,20 @@ class EnhancedeZBinaryFileType extends eZDataType
             foreach ( $binaryFiles as $binaryFile )
             {
                 $mimeType =  $binaryFile->attribute( "mime_type" );
-                list( $prefix, $suffix ) = preg_split ( '[/]', $mimeType );
+                list( $prefix, $suffix ) = explode('/', $mimeType );
                 $orig_dir = $storage_dir . '/'. $downloadPath . '/' . $prefix;
                 $fileName = $binaryFile->attribute( "filename" );
 
                 // Check if there are any other records in ezbinaryfile that point to that fileName.
                 $binaryObjectsWithSameFileName = eZBinaryFile::fetchByFileName( $fileName );
 
+                $filePath = $orig_dir . "/" . $fileName;
+                $file = eZClusterFileHandler::instance( $filePath );
+
+                if ( $file->exists() and count( $binaryObjectsWithSameFileName ) < 1 )
+                    $file->delete();
+
+                $orig_dir = $storage_dir . '/original/' . $prefix;
                 $filePath = $orig_dir . "/" . $fileName;
                 $file = eZClusterFileHandler::instance( $filePath );
 
@@ -191,7 +198,7 @@ class EnhancedeZBinaryFileType extends eZDataType
             if ( $binaryFile != null )
             {
                 $mimeType =  $binaryFile->attribute( "mime_type" );
-                list( $prefix, $suffix ) = preg_split ('[/]', $mimeType );
+                list( $prefix, $suffix ) = explode('/', $mimeType );
                 $orig_dir = $storage_dir . "/original/" . $prefix;
                 $fileName = $binaryFile->attribute( "filename" );
 
