@@ -36,9 +36,9 @@ class EnhancedeZBinaryFileType extends eZDataType
     const MAX_FILESIZE_FIELD = 'data_int1';
     const MAX_FILESIZE_VARIABLE = '_enhancedezbinaryfile_max_filesize_';
     const DATA_TYPE_STRING = "enhancedezbinaryfile";
-    
+
     /*!
-     Construction of the class, note that the second parameter in eZDataType 
+     Construction of the class, note that the second parameter in eZDataType
      is the actual name showed in the datatype dropdown list.
     */
     function __construct()
@@ -390,62 +390,62 @@ class EnhancedeZBinaryFileType extends eZDataType
         EnhancedeZBinaryFileType::checkFileUploads();
         if ( eZHTTPFile::canFetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) ) != eZHTTPFile::UPLOADEDFILE_OK ) {
             return false;
-	}
-	//Check allowed file type - must do it here,again - otherwise an illegal
-	//file will still be created in the storage directory
+    }
+    //Check allowed file type - must do it here,again - otherwise an illegal
+    //file will still be created in the storage directory
         $binaryFile = eZHTTPFile::fetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) );
-	if (!$binaryFile) return eZInputValidator::STATE_INVALID;
+    if (!$binaryFile) return eZInputValidator::STATE_INVALID;
 
         $moduleINI = eZINI::instance( 'module.ini' );
-	$allowed = $moduleINI->variable('AllowedFileTypes', 'AllowedFileTypeList');
+    $allowed = $moduleINI->variable('AllowedFileTypes', 'AllowedFileTypeList');
 
-	// $binaryFile->attribute( 'mime_type_part' ) not always the extension
-	$extension = preg_replace('/.*\.(.+?)$/', '\\1', $binaryFile->attribute( "original_filename" ) );
-	if (!in_array(strtolower($extension),$allowed))
-	{
-		$contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes','Failed to store file. Only the following file types are allowed: %1.' ), implode(", ",$allowed) );
-		return eZInputValidator::STATE_INVALID;
-	}
- 
+    // $binaryFile->attribute( 'mime_type_part' ) not always the extension
+    $extension = preg_replace('/.*\.(.+?)$/', '\\1', $binaryFile->attribute( "original_filename" ) );
+    if (!in_array(strtolower($extension),$allowed))
+    {
+        $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes','Failed to store file. Only the following file types are allowed: %1.' ), implode(", ",$allowed) );
+        return eZInputValidator::STATE_INVALID;
+    }
+
         //$contentObjectAttribute->setContent( $binaryFile );
 
         if ( $binaryFile instanceof eZHTTPFile )
         {
-		//clean up older files.
-		$moduleINI = eZINI::instance( 'module.ini' );
-		$maxFiles=$moduleINI->variable('RemoveFiles', 'MaxFiles');
-		$downloadPath=$moduleINI->variable('RemoveFiles', 'DownloadPath');
-		$downloadPath=trim($downloadPath,"/");
-		if (!$downloadPath) $downloadPath='original/collected';
+        //clean up older files.
+        $moduleINI = eZINI::instance( 'module.ini' );
+        $maxFiles=$moduleINI->variable('RemoveFiles', 'MaxFiles');
+        $downloadPath=$moduleINI->variable('RemoveFiles', 'DownloadPath');
+        $downloadPath=trim($downloadPath,"/");
+        if (!$downloadPath) $downloadPath='original/collected';
 
-		if ( $maxFiles>0 )
-		{
-			$Files = array();
-			$storageDir=eZSys::storageDirectory();
-			$fileCollection=eZDir::recursiveFindRelative( $storageDir, $downloadPath, '.*' );
-			if ( count($fileCollection)>=$maxFiles )
-			{
-				foreach ( $fileCollection as $fileItem )
-                		{
-					$lastModified = filemtime( $storageDir .'/'. $fileItem);
-					$Files[$fileItem] = filemtime($storageDir .'/'. $fileItem);
-                		}
-            			asort($Files, SORT_NUMERIC);
-				while (count($Files)>=$maxFiles){
-					$removeFile=key($Files);
-					if ( file_exists( $storageDir .'/'. $removeFile ) )
-					{
-						if (!unlink( $storageDir .'/'. $removeFile ) )
-						{
-							eZDebug::writeError( "Failed to delete file: " . $storageDir .'/'. $removeFile, "EnhancedeZBinaryFileType" );
-							return false;
-						}
-					}
-					array_shift($Files);
-				}
-			}
-		}
-		//end cleanup
+        if ( $maxFiles>0 )
+        {
+            $Files = array();
+            $storageDir=eZSys::storageDirectory();
+            $fileCollection=eZDir::recursiveFindRelative( $storageDir, $downloadPath, '.*' );
+            if ( count($fileCollection)>=$maxFiles )
+            {
+                foreach ( $fileCollection as $fileItem )
+                        {
+                    $lastModified = filemtime( $storageDir .'/'. $fileItem);
+                    $Files[$fileItem] = filemtime($storageDir .'/'. $fileItem);
+                        }
+                        asort($Files, SORT_NUMERIC);
+                while (count($Files)>=$maxFiles){
+                    $removeFile=key($Files);
+                    if ( file_exists( $storageDir .'/'. $removeFile ) )
+                    {
+                        if (!unlink( $storageDir .'/'. $removeFile ) )
+                        {
+                            eZDebug::writeError( "Failed to delete file: " . $storageDir .'/'. $removeFile, "EnhancedeZBinaryFileType" );
+                            return false;
+                        }
+                    }
+                    array_shift($Files);
+                }
+            }
+        }
+        //end cleanup
 
            // $contentObjectAttributeID = $contentObjectAttribute->attribute( "id" );
             //$version = $contentObjectAttribute->attribute( "version" );
@@ -466,19 +466,19 @@ class EnhancedeZBinaryFileType extends eZDataType
                 return false;
             }
 
-	//Adds xmltext to collection attribute with file info to data_text attribute
-	$doc = new DOMDocument( '1.0', 'utf-8' );
+    //Adds xmltext to collection attribute with file info to data_text attribute
+    $doc = new DOMDocument( '1.0', 'utf-8' );
         $root = $doc->createElement( 'binaryfile-info' );
-	$binaryFileList = $doc->createElement( 'binaryfile-attributes' );
-	foreach ( $binaryFile as $key => $binaryFileItem )
-	{
-		$binaryFileElement = $doc->createElement(  $key, $binaryFileItem );
-		$binaryFileList->appendChild( $binaryFileElement );
-	}
-	$root->appendChild( $binaryFileList );
-	$doc->appendChild( $root );
-	$docText = EnhancedeZBinaryFileType::domString( $doc );
-	$collectionAttribute->setAttribute( 'data_text', $docText );
+    $binaryFileList = $doc->createElement( 'binaryfile-attributes' );
+    foreach ( $binaryFile as $key => $binaryFileItem )
+    {
+        $binaryFileElement = $doc->createElement(  $key, $binaryFileItem );
+        $binaryFileList->appendChild( $binaryFileElement );
+    }
+    $root->appendChild( $binaryFileList );
+    $doc->appendChild( $root );
+    $docText = EnhancedeZBinaryFileType::domString( $doc );
+    $collectionAttribute->setAttribute( 'data_text', $docText );
         }
         return true;
     }
@@ -490,24 +490,24 @@ class EnhancedeZBinaryFileType extends eZDataType
     function validateCollectionAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         //validateCollection goes first, then the fetchCollection
-	/*WITH THE ENCTYPE OF MULTIPART THE $_POST FOR A FILE IS EMPTY so can't use haspostvariable */
+    /*WITH THE ENCTYPE OF MULTIPART THE $_POST FOR A FILE IS EMPTY so can't use haspostvariable */
 
-	$binaryFile = eZHTTPFile::fetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) );
+    $binaryFile = eZHTTPFile::fetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) );
         $classAttribute = $contentObjectAttribute->contentClassAttribute();
-	//This is only checking if it is required or not
-	if ( !$binaryFile )
-	{
-		if ( $contentObjectAttribute->validateIsRequired() )
-		{
-			$contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes','Input required.' ) );
-			return eZInputValidator::STATE_INVALID;
-		}
-		else
-			return eZInputValidator::STATE_ACCEPTED;
-	}
-	else {
-		return $this->validateFileHTTPInput( $base, $contentObjectAttribute, $classAttribute );
-	}
+    //This is only checking if it is required or not
+    if ( !$binaryFile )
+    {
+        if ( $contentObjectAttribute->validateIsRequired() )
+        {
+            $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes','Input required.' ) );
+            return eZInputValidator::STATE_INVALID;
+        }
+        else
+            return eZInputValidator::STATE_ACCEPTED;
+    }
+    else {
+        return $this->validateFileHTTPInput( $base, $contentObjectAttribute, $classAttribute );
+    }
     }
 
     /*
@@ -516,32 +516,32 @@ class EnhancedeZBinaryFileType extends eZDataType
 
     function validateFileHTTPInput( $base, $contentObjectAttribute, $classAttribute )
     {
-	//Check allowed file type
-	//Have to do it here again, otherwise no error message
+    //Check allowed file type
+    //Have to do it here again, otherwise no error message
         $binaryFile = eZHTTPFile::fetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) );
-	if (!$binaryFile) return eZInputValidator::STATE_INVALID;
+    if (!$binaryFile) return eZInputValidator::STATE_INVALID;
 
         $moduleINI = eZINI::instance( 'module.ini' );
-	$allowed = $moduleINI->variable('AllowedFileTypes', 'AllowedFileTypeList');
+    $allowed = $moduleINI->variable('AllowedFileTypes', 'AllowedFileTypeList');
 
-	// $binaryFile->attribute( 'mime_type_part' ) not always the extension
-	$extension = preg_replace('/.*\.(.+?)$/', '\\1', $binaryFile->attribute( "original_filename" ) );
-	if (!in_array(strtolower($extension),$allowed))
-	{
-		$contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes','Failed to store file. Only the following file types are allowed: %1.' ), implode(", ",$allowed) );
-		return eZInputValidator::STATE_INVALID;
-	}
+    // $binaryFile->attribute( 'mime_type_part' ) not always the extension
+    $extension = preg_replace('/.*\.(.+?)$/', '\\1', $binaryFile->attribute( "original_filename" ) );
+    if (!in_array(strtolower($extension),$allowed))
+    {
+        $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes','Failed to store file. Only the following file types are allowed: %1.' ), implode(", ",$allowed) );
+        return eZInputValidator::STATE_INVALID;
+    }
 
-	//Check size 
-	$mustUpload = false;
+    //Check size
+    $mustUpload = false;
         $maxSize = 1024 * 1024 * $classAttribute->attribute( self::MAX_FILESIZE_FIELD );
 
 /* Since it is not an ezbinary file this can never be true
-   unfortunately, this is where the check would be to not upload the file 
+   unfortunately, this is where the check would be to not upload the file
    multiple times in the event the form fails somewhere.  Unfortunately it
    can't be a binary file since it is a collection object and not a content
    object.
-	if ( $contentObjectAttribute->validateIsRequired() )
+    if ( $contentObjectAttribute->validateIsRequired() )
         {
             $contentObjectAttributeID = $contentObjectAttribute->attribute( "id" );
             $version = $contentObjectAttribute->attribute( "version" );
@@ -553,7 +553,7 @@ class EnhancedeZBinaryFileType extends eZDataType
         }
 */
         $canFetchResult = EnhancedeZBinaryFileType::canFetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ), $maxSize );
-	//$binaryfile doesn't have an attribute(http_name)
+    //$binaryfile doesn't have an attribute(http_name)
         if ( $mustUpload && $canFetchResult === eZHTTPFile::UPLOADEDFILE_DOES_NOT_EXIST )
         {
             $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'A valid file is required.' ) );
@@ -569,7 +569,7 @@ class EnhancedeZBinaryFileType extends eZDataType
             $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'The size of the uploaded file exceeds the maximum upload size: %1 bytes.' ), $maxSize );
             return eZInputValidator::STATE_INVALID;
         }
-	//Dropped all the way through with no error
+    //Dropped all the way through with no error
         return eZInputValidator::STATE_ACCEPTED;
     }
     /*!
