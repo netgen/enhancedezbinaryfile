@@ -2,6 +2,26 @@
 <div class="block">
     <label>{'Max. file size'|i18n( 'design/standard/class/datatype' )}:</label>
     <p>{$class_attribute.data_int1}&nbsp;MB</p>
-    <label>{'Allowed mime types'|i18n( 'design/standard/class/datatype' )}:</label>
-    <p>{$class_attribute.data_text1}</p>
+    <label>{'Allowed file types'|i18n( 'design/standard/class/datatype' )}:</label>
+    {if $class_attribute.data_text1|trim|length|gt(0)}
+        {def $allowedFileTypes = $class_attribute.data_text1|explode('|')}
+        <table class="list" cellspacing="0">
+            <tr>
+                <th>{'File extension'|i18n( 'design/standard/content/datatype' )}</th>
+                <th>{'MIME types'|i18n( 'design/standard/content/datatype' )}</th>
+            </tr>
+            {foreach $allowedFileTypes as $allowedFileType}
+                {if ezini_hasvariable( $allowedFileType, 'Types', 'mime.ini' ) }
+                    {def $allowedFileTypeMimeTypesList = ezini( $allowedFileType, 'Types', 'mime.ini')|implode(', ')}
+                    <tr>
+                        <td>{$allowedFileType|wash( xhtml )}</td>
+                        <td>{$allowedFileTypeMimeTypesList|wash( xhtml )}</td>
+                    </tr>
+                    {undef $allowedFileTypeMimeTypesList}
+                {/if}
+            {/foreach}
+        </table>
+    {else}
+        <p>All file types</p>
+    {/if}
 </div>
