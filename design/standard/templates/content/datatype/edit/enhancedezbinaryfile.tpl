@@ -35,4 +35,26 @@
 <input class="box" name="{$attribute_base}_data_enhancedbinaryfilename_{$attribute.id}" type="file" />
 </div>
 
+<div class="block">
+    <p>{'Allowed file types'|i18n( 'design/standard/content/datatype' )}:</p>
+    {def $allowedFileTypes = $attribute.contentclass_attribute.data_text1|explode('|')}
+    <table class="list" cellspacing="0">
+        <tr>
+            <th>{'File extension'|i18n( 'design/standard/content/datatype' )}</th>
+            <th>{'MIME types'|i18n( 'design/standard/content/datatype' )}</th>
+
+        </tr>
+        {foreach $allowedFileTypes as $allowedFileType}
+            {if ezini_hasvariable( $allowedFileType, 'Types', 'mime.ini' ) }
+                {def $allowedFileTypeMimeTypesList = ezini( $allowedFileType, 'Types', 'mime.ini')|implode(', ')}
+                <tr>
+                    <td>{$allowedFileType|wash( xhtml )}</td>
+                    <td>{$allowedFileTypeMimeTypesList|wash( xhtml )}</td>
+                </tr>
+                {undef $allowedFileTypeMimeTypesList}
+            {/if}
+        {/foreach}
+    </table>
+</div>
+
 {/default}

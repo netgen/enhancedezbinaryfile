@@ -1,4 +1,4 @@
-<?
+<?php
 /*!
   \class   TemplateParseXMLOperator templateparsexmloperator.php
   \ingroup eZTemplateOperators
@@ -63,7 +63,7 @@ class TemplateParseXMLOperator
 		{
 			$dom = new DOMDocument( '1.0', 'utf-8' );
 			if ($dom->loadXML( $operatorValue ))
-			{	
+			{
 				$FileAttributeValue = $dom->getElementsByTagName( $firstParam )->item(0)->textContent;
 				if( !$FileAttributeValue )
 					$FileAttributeValue = $dom->getElementsByTagName( $firstParam )->item(0)->getAttribute('value');
