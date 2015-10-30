@@ -352,6 +352,12 @@ class EnhancedeZBinaryFileType extends eZDataType
     function validateObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         EnhancedeZBinaryFileType::checkFileUploads();
+
+        if ( $this->isDeletingFile( $http, $contentObjectAttribute ) )
+        {
+            return false;
+        }
+
         $classAttribute = $contentObjectAttribute->contentClassAttribute();
         $mustUpload = false;
         $httpFileName = $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" );
@@ -362,11 +368,14 @@ class EnhancedeZBinaryFileType extends eZDataType
         $contentObjectAttributeID = $contentObjectAttribute->attribute( "id" );
         $version = $contentObjectAttribute->attribute( "version" );
 
-        $binary = eZBinaryFile::fetch( $contentObjectAttributeID, $version );
-
-        if ( empty( $binary ) && $canFetchResult )
+        if ( $canFetchResult === 0 || $canFetchResult === true )
         {
-            $binary = eZHTTPFile::fetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) );
+            $binary = eZHTTPFile::fetch( $httpFileName );
+        }
+
+        if( empty( $binary ) )
+        {
+            $binary = eZBinaryFile::fetch( $contentObjectAttributeID, $version );
         }
 
         if ( empty( $binary ) )
@@ -445,7 +454,9 @@ class EnhancedeZBinaryFileType extends eZDataType
             return false;
         }
 
-        if ( !eZHTTPFile::canFetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) ) )
+        $canFetch = eZHTTPFile::canFetch( $base . "_data_enhancedbinaryfilename_" . $contentObjectAttribute->attribute( "id" ) );
+
+        if ( $canFetch !== 0 && $canFetch !== true )
         {
             return false;
         }
@@ -471,6 +482,43 @@ class EnhancedeZBinaryFileType extends eZDataType
             if ( $mime == '' )
             {
                 $mime = $binaryFile->attribute( "mime_type" );
+            }
+
+            $classAttribute = $contentObjectAttribute->contentClassAttribute();
+            $allowedFileTypes = $classAttribute->attribute( self::ALLOWED_FILE_TYPES_FIELD );
+
+            // if allowed mime types are not set in the class attribute, check global restrictions on file extensions
+            if ( empty( $allowedFileTypes ) )
+            {
+                $moduleINI = eZINI::instance('module.ini');
+                $allowed = $moduleINI->variable('AllowedFileTypes', 'AllowedFileTypeList');
+
+                $extension = preg_replace('/.*\.(.+?)$/', '\\1', $binaryFile->attribute( "original_filename" ) );
+                if (!in_array(strtolower($extension),$allowed))
+                {
+                    eZDebug::writeError( ezpI18n::tr( 'kernel/classes/datatypes','Failed to store file. Only the following file types are allowed: %1.' ), implode(", ",$allowed) );
+                    return false;
+                }
+            }
+            else
+            {
+                $mimeIni = eZINI::instance('mime.ini');
+                $allowedFileTypesList = explode( '|', $allowedFileTypes );
+
+                $extension = preg_replace('/.*\.(.+?)$/', '\\1', $binaryFile->attribute( "original_filename" ) );
+
+                if ( !in_array( strtolower( $extension ),$allowedFileTypesList ) )
+                {
+                    eZDebug::writeError( ezpI18n::tr( 'kernel/classes/datatypes','Failed to store file. Only the following file types are allowed: %1.' ), implode(", ", $allowedFileTypesList) );
+                    return false;
+                }
+
+                $allowedMimeTypesList = $mimeIni->variable( $extension, 'Types' );
+                if ( !in_array( $binaryFile->attribute( 'mime_type' ), $allowedMimeTypesList ) )
+                {
+                    eZDebug::writeError( ezpI18n::tr( 'kernel/classes/datatypes','Failed to store file. Only the following mime types are allowed for file extension %1: %2.' ), $extension, implode(', ', $allowedMimeTypesList ) );
+                    return false;
+                }
             }
 
             $extension = eZFile::suffix( $binaryFile->attribute( "original_filename" ) );
@@ -794,7 +842,7 @@ class EnhancedeZBinaryFileType extends eZDataType
 
         if ( $canFetch !== 0 && $canFetch !== true )
         {
-            return false;
+            return eZInputValidator::STATE_INVALID;
         }
 
         //Check allowed file type - must do it here,again - otherwise an illegal
