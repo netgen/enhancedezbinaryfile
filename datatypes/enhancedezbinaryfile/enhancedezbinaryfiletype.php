@@ -1145,7 +1145,8 @@ class EnhancedeZBinaryFileType extends eZDataType
 
         $allowedFileTypesNode = $dom->createElement( 'allowed-file-types' );
 
-        if( !empty($classAttribute->attribute( self::ALLOWED_FILE_TYPES_FIELD ) ) )
+        $allowedFileTypesAttribute = $classAttribute->attribute( self::ALLOWED_FILE_TYPES_FIELD );
+        if ( !empty( $allowedFileTypesAttribute ) )
         {
             $allowedFileTypesList = explode( '|', $classAttribute->attribute( self::ALLOWED_FILE_TYPES_FIELD ) );
 
