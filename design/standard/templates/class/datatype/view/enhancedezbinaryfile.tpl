@@ -3,7 +3,7 @@
     <label>{'Max. file size'|i18n( 'design/standard/class/datatype' )}:</label>
     <p>{$class_attribute.data_int1}&nbsp;MB</p>
     <label>{'Allowed file types'|i18n( 'design/standard/class/datatype' )}:</label>
-    {if $class_attribute.data_text1|trim|length|gt(0)}
+    {if $class_attribute.data_text1|trim|count_chars|gt(0)}
         {def $allowedFileTypes = $class_attribute.data_text1|explode('|')}
         <table class="list" cellspacing="0">
             <tr>

@@ -7,7 +7,7 @@
 
     {def $selectedFileTypes = array()}
 
-    {if $class_attribute.data_text1|trim|length|gt(0)}
+    {if $class_attribute.data_text1|trim|count_chars|gt(0)}
         {set $selectedFileTypes = $class_attribute.data_text1|explode('|')}
     {/if}
 
