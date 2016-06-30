@@ -4,6 +4,7 @@
 {* Current file. *}
 <div class="block">
 <label>{'Current file'|i18n( 'design/standard/content/datatype' )}:</label>
+</div>
 
 {* New file. *}
 <div class="block">
