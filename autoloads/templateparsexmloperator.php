@@ -82,7 +82,8 @@ class TemplateParseXMLOperator
 				if( !$FileAttributeValue )
 					$FileAttributeValue = $dom->getElementsByTagName( 'Filename' )->item(0)->getAttribute('value');
 			}
-			if(file_exists(eZSys::wwwDir().$FileAttributeValue)){
+            $file = new eZFSFileHandler(trim($FileAttributeValue, '/'));
+            if($file->exists()){
 				$operatorValue=true;
 			} else {
 				$operatorValue=false;
