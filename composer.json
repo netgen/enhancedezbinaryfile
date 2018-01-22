@@ -2,7 +2,7 @@
     "name": "netgen/enhancedezbinaryfile",
     "description": "The Enhanced eZBinaryfile datatype makes it possible to use the information collector functionality to allow (anonymous) users to send/upload files as attachments.",
     "type": "ezpublish-legacy-extension",
-    "license": "GPL-2.0",
+    "license": "GPL-2.0-only",
     "authors": [
         {
             "name": "Leiden Tech",
