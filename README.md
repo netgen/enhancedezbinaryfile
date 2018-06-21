@@ -1,6 +1,11 @@
 enhancedezbinaryfile
 ====================
 
+[![Downloads](https://img.shields.io/packagist/dt/netgen/enhancedezbinaryfile.svg?style=flat-square)](https://packagist.org/packages/netgen/enhancedezbinaryfile/stats)
+[![Latest stable](https://img.shields.io/packagist/v/netgen/enhancedezbinaryfile.svg?style=flat-square)](https://packagist.org/packages/netgen/enhancedezbinaryfile)
+[![License](https://img.shields.io/github/license/netgen/enhancedezbinaryfile.svg?style=flat-square)](LICENSE)
+[![PHP](https://img.shields.io/badge/php-%3E%3D%205.6-8892BF.svg?style=flat-square)](https://secure.php.net/)
+
 The Enhanced eZBinaryfile datatype makes it possible to use the information collector functionality to allow (anonymous) users to send/upload files as attachments.  If mail is enabled for the information collector, the file is sent as a multipart MIME attachment./*
     Enhanced eZBinaryfile for eZ publish 4.0+
     Developed by Steven E. Bailey and Sebastiaan van der Vliet
